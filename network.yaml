@@ -1,0 +1,81 @@
+- name: 'Add/Drop 1'
+  type: 'AddDropROADM'
+  client_connections:
+    - name: 'Client 1'
+      port: 1
+    - name: 'Client 2'
+      port: 2
+  express_connections:
+    - name: 'Line 1'
+      port: 1
+    - name: 'Line 2'
+      port: 2
+    - name: 'Line 3'
+      port: 3
+
+- name: 'Add/Drop 2'
+  type: 'AddDropROADM'
+  client_connections:
+    - name: 'Client 3'
+      port: 1
+  express_connections:
+    - name: 'Line 1'
+      port: 1
+    - name: 'Line 2'
+      port: 2
+    - name: 'Line 3'
+      port: 3
+
+- name: 'Line 1'
+  type: 'LineDegreeROADM'
+  line_connections:
+    - name: 'Line 2'
+      port: 1
+    - name: 'Line 3'
+      port: 2
+  express_connections:
+    - name: 'Add/Drop 1'
+      port: 1
+    - name: 'Add/Drop 2'
+      port: 2
+
+- name: 'Line 2'
+  type: 'LineDegreeROADM'
+  line_connections:
+    - name: 'Line 1'
+      port: 1
+    - name: 'Line 3'
+      port: 2
+  express_connections:
+    - name: 'Add/Drop 1'
+      port: 1
+    - name: 'Add/Drop 2'
+      port: 2
+
+- name: 'Line 3'
+  type: 'LineDegreeROADM'
+  line_connections:
+    - name: 'Line 1'
+      port: 1
+    - name: 'Line 2'
+      port: 2
+  express_connections:
+    - name: 'Add/Drop 1'
+      port: 1
+    - name: 'Add/Drop 2'
+      port: 2
+
+- name: 'Client 1'
+  type: 'Client'
+  client_connections:
+    - name: 'Add/Drop 1'
+
+- name: 'Client 2'
+  type: 'Client'
+  client_connections:
+    - name: 'Add/Drop 1'
+
+- name: 'Client 3'
+  type: 'Client'
+  client_connections:
+    - name: 'Add/Drop 2'
