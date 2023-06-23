@@ -1,0 +1,387 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Device List {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+    <style>
+        .device-status {
+            font-size: 10px;
+        }
+
+        .mapboxgl-popup {
+            width: 400px;
+        }
+
+        .mapboxgl-popup-content {
+            text-align: center;
+            font-family: 'Open Sans', sans-serif;
+
+        }
+    </style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <section class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+
+                    <!-- [ breadcrumb ] start -->
+                    <div class="page-header">
+                        <div class="page-block">
+                            <div class="row align-items-center">
+                                <div class="col-md-12">
+                                    <div class="page-header-title">
+                                        <h5 class="m-b-10">Device List</h5>
+                                    </div>
+                                    <ul class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a href="javascript:">Device List</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ breadcrumb ] end -->
+
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <div class="row">
+
+
+                                <div class="col-sm-12">
+                                    <!-- [ Navigation Pills ] start -->
+                                    <ul class=" nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="pills-network-1-tab"
+                                               data-toggle="pill"
+                                               href="#network-1" role="tab" aria-controls="pills-network-1"
+                                               aria-selected="true">Network 1</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="pills-network-2-tab" data-toggle="pill"
+                                               href="#network-2" role="tab" aria-controls="pills-network-2"
+                                               aria-selected="false">Network 2</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="pills-network-3-tab" data-toggle="pill"
+                                               href="#network-3" role="tab" aria-controls="pills-network-3"
+                                               aria-selected="false">Network 3</a>
+                                        </li>
+                                    </ul>
+                                    <!-- [ Navigation Pills ] end -->
+
+                                    <!-- [ Content ] start -->
+                                    <div class="tab-content" id="pills-tabContent">
+
+                                        <!-- [ Network 1 ] start -->
+                                        <div class="tab-pane fade show active" id="network-1" role="tabpanel"
+                                             aria-labelledby="pills-network-1-tab">
+                                            <div class="row">
+                                                <!-- [ Devices Table ] start -->
+                                                <div class="col-md-6">
+                                                    <h4>Devices</h4>
+                                                    <br>
+                                                    <div class="table-border-style">
+                                                        <div class="table-responsive">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th>#</th>
+                                                                    <th>Name</th>
+                                                                    <th>Color</th>
+                                                                    <th>Description</th>
+                                                                    <th>IP Address</th>
+                                                                    <th>Status</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                {% for device in devices %}
+                                                                    <tr>
+                                                                        <th scope="row">{{ device.id }}</th>
+                                                                        <td>{{ device.name }}</td>
+                                                                        <td class="text-center"><i
+                                                                                class="fas fa-circle text-c-{{ device.color }} f-10"></i>
+                                                                        </td>
+                                                                        <td>{{ device.description }}</td>
+                                                                        <td>{{ device.ip_address }}</td>
+                                                                        {% if device.online %}
+                                                                            <td class="text-center"><i
+                                                                                    class="fas fa-circle text-c-green f-10 device-status"
+                                                                                    data-device-id="{{ device.id }}"></i>
+                                                                            </td>
+                                                                        {% else %}
+                                                                            <td class="text-center"><i
+                                                                                    class="fas fa-circle text-c-red f-10 device-status"
+                                                                                    data-device-id="{{ device.id }}"></i>
+                                                                            </td>
+                                                                        {% endif %}
+                                                                        <td>
+                                                                            <a href="{% url 'devices:device-page' device_id=device.id %}">View</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                    {% empty %}
+                                                                    <tr>
+                                                                        <td colspan="4">No devices found.</td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- [ Devices Table ] end -->
+
+                                                <!-- [ Network Map ] start -->
+                                                <div class="col-md-6">
+                                                    <h4>Network Map</h4>
+                                                    <hr>
+                                                    <div id="map" class="set-map" style="height:400px;"></div>
+                                                </div>
+                                                <!-- [ Network Map ] end -->
+                                            </div>
+                                        </div>
+                                        <!-- [ Network 1 ] end -->
+
+                                        <!-- [ Network 2 ] start -->
+                                        <div class="row tab-pane fade" id="network-2" role="tabpanel"
+                                             aria-labelledby="pills-network-2-tab">
+                                            <!-- [ Devices Table ] start -->
+                                            <div class="row">
+                                                <!-- [ Devices Table ] start -->
+                                                <div class="col-md-6">
+                                                    <h4>Devices</h4>
+                                                    <br>
+                                                    <div class="table-border-style">
+                                                        <div class="table-responsive">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th>#</th>
+                                                                    <th>Name</th>
+                                                                    <th>Color</th>
+                                                                    <th>Description</th>
+                                                                    <th>IP Address</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                {% for device in devices %}
+                                                                    <tr>
+                                                                        <th scope="row">{{ device.id }}</th>
+                                                                        <td>{{ device.name }}</td>
+                                                                        <td>{{ device.color }}</td>
+                                                                        <td>{{ device.description }}</td>
+                                                                        <td>{{ device.ip_address }}</td>
+                                                                        <td>
+                                                                            <a href="{% url 'devices:device-page' device_id=device.id %}">View</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                    {% empty %}
+                                                                    <tr>
+                                                                        <td colspan="4">No devices found.</td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- [ Devices Table ] end -->
+
+                                                <!-- [ Network Map ] start -->
+                                                <div class="col-md-6">
+                                                    <h4>Network Map</h4>
+                                                    <hr>
+                                                    <div id="map" class="set-map" style="height:400px;"></div>
+                                                </div>
+                                                <!-- [ Network Map ] end -->
+                                            </div>
+                                        </div>
+                                        <!-- [ Network 2 ] end -->
+
+                                        <!-- [ Network 3 ] start -->
+                                        <div class="tab-pane fade" id="network-3" role="tabpanel"
+                                             aria-labelledby="pills-network-3-tab">
+                                            <div class="row">
+                                                <!-- [ Devices Table ] start -->
+                                                <div class="col-md-6">
+                                                    <h4>Devices</h4>
+                                                    <br>
+                                                    <div class="table-border-style">
+                                                        <div class="table-responsive">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th>#</th>
+                                                                    <th>Name</th>
+                                                                    <th>Color</th>
+                                                                    <th>Description</th>
+                                                                    <th>Latitude</th>
+                                                                    <th>Longitude</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                {% for device in devices %}
+                                                                    <tr>
+                                                                        <th scope="row">{{ device.id }}</th>
+                                                                        <td>{{ device.name }}</td>
+                                                                        <td>{{ device.color }}</td>
+                                                                        <td>{{ device.description }}</td>
+                                                                        <td>{{ device.latitude }}</td>
+                                                                        <td>{{ device.longitude }}</td>
+                                                                        <td>
+                                                                            <a href="{% url 'devices:device-page' device_id=device.id %}">View</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                    {% empty %}
+                                                                    <tr>
+                                                                        <td colspan="4">No devices found.</td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- [ Devices Table ] end -->
+
+                                                <!-- [ Network Map ] start -->
+                                                <div class="col-md-6">
+                                                    <h4>Network Map</h4>
+                                                    <hr>
+                                                    <div id="map" class="set-map" style="height:400px;"></div>
+                                                </div>
+                                                <!-- [ Network Map ] end -->
+                                            </div>
+                                        </div>
+                                        <!-- [ Network 3 ] end -->
+
+                                    </div>
+                                    <!-- [ Content ] end -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock content %}
+
+{% block javascripts %}
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css' rel='stylesheet'/>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYWxlc2t1Y2VyYSIsImEiOiJjbGc5OG0wd3MxNWI2M3NvOTIyMDJwdGV4In0.pLzkwEwCdgexkT_ai7yP8Q';
+
+        function initMap() {
+            console.log("Initializing map...");
+
+            // Create a new map centered on the first device's address
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/aleskucera/clg9at7fl001d01pe1mwrkvgl',
+                center: [15.251112431996722, 49.78450556341959], // Center of Czech Republic
+                zoom: 6
+            });
+
+            // Wait for the map style to finish loading before adding markers
+            map.on('load', function () {
+                console.log("Map initialized. Adding markers...");
+
+                // Loop through the devices and add a marker for each one
+                {% for device in devices %}
+                    console.log("Adding marker for device {{ device.id }}...");
+                    var marker = new mapboxgl.Marker()
+                        .setLngLat([{{ device.longitude }}, {{ device.latitude }}])
+                        .setPopup(new mapboxgl.Popup({
+                            offset: 25
+                        }).setHTML('<h4>{{ device.name }}</h4>'))
+                        .addTo(map);
+                    console.log("Marker added for device {{ device.id }}.");
+
+                    // Connect this marker to the previous marker with a line
+                    if (prevMarker) {
+                        var line = {
+                            "type": "FeatureCollection",
+                            "features": [
+                                {
+                                    "type": "Feature",
+                                    "geometry": {
+                                        "type": "LineString",
+                                        "coordinates": [
+                                            [prevMarker._lngLat.lng, prevMarker._lngLat.lat],
+                                            [marker._lngLat.lng, marker._lngLat.lat]
+                                        ]
+                                    },
+                                    "properties": {}
+                                }
+                            ]
+                        };
+                        map.addLayer({
+                            "id": "route" + {{ device.id }},
+                            "type": "line",
+                            "source": {
+                                "type": "geojson",
+                                "data": line
+                            },
+                            "layout": {
+                                "line-join": "round",
+                                "line-cap": "round"
+                            },
+                            "paint": {
+                                "line-color": "#FF0000",
+                                "line-width": 2
+                            }
+                        });
+                    }
+
+                    // Keep track of the previous marker
+                    var prevMarker = marker;
+                {% endfor %}
+
+                console.log("All markers and lines added.");
+            });
+        }
+
+        function updateDeviceStatusIcon(deviceId, isOnline) {
+            const icon = document.querySelector(`.device-status[data-device-id="${deviceId}"]`);
+            if (icon) {
+                icon.classList.remove('text-c-red', 'text-c-green');
+                icon.classList.add(isOnline ? 'text-c-green' : 'text-c-red');
+            }
+        }
+
+        async function fetchDeviceStatus(deviceId) {
+            const response = await fetch(`/api/devices/${deviceId}/`);
+            const data = await response.json();
+            return data.online;
+        }
+
+        window.addEventListener('load', async () => {
+            console.log('Page loaded. Starting device status update loop...');
+
+            while (true) {
+                // Loop through all device status icons and update them
+                const icons = document.querySelectorAll('.device-status');
+                for (const icon of icons) {
+                    const deviceId = icon.dataset.deviceId;
+                    const isOnline = await fetchDeviceStatus(deviceId);
+                    updateDeviceStatusIcon(deviceId, isOnline);
+                }
+                console.log('Device status updated.');
+
+                // Wait for 30 seconds before updating again
+                await new Promise(resolve => setTimeout(resolve, 30000));
+            }
+        });
+
+        // Call the initMap function when the page has finished loading
+        window.onload = initMap;
+    </script>
+{% endblock javascripts %}
