@@ -1,81 +1,82 @@
 - name: 'Add/Drop 1'
   type: 'AddDropROADM'
   client_connections:
-    - name: 'Client 1'
-      port: 1
-    - name: 'Client 2'
-      port: 2
-  express_connections:
-    - name: 'Line 1'
-      port: 1
-    - name: 'Line 2'
-      port: 2
-    - name: 'Line 3'
-      port: 3
+    port_1: 'Client 1'
+  intra_connections:
+    port_1: 'Line 1'
+    port_2: 'Line 2'
 
 - name: 'Add/Drop 2'
   type: 'AddDropROADM'
   client_connections:
-    - name: 'Client 3'
-      port: 1
-  express_connections:
-    - name: 'Line 1'
-      port: 1
-    - name: 'Line 2'
-      port: 2
-    - name: 'Line 3'
-      port: 3
+    port_1: 'Client 2'
+  intra_connections:
+    port_1: 'Line 3'
+    port_2: 'Line 4'
+
+- name: 'Add/Drop 3'
+  type: 'AddDropROADM'
+  client_connections:
+    port_1: 'Client 3'
+    port_2: 'Client 4'
+  intra_connections:
+    port_1: 'Line 5'
+    port_2: 'Line 6'
 
 - name: 'Line 1'
   type: 'LineDegreeROADM'
-  line_connections:
-    - name: 'Line 2'
-      port: 1
-    - name: 'Line 3'
-      port: 2
-  express_connections:
-    - name: 'Add/Drop 1'
-      port: 1
-    - name: 'Add/Drop 2'
-      port: 2
+  line_connection: 'Line 5'
+  intra_connections:
+    port_1: 'Line 2'
+    port_2: 'Add/Drop 1'
 
 - name: 'Line 2'
   type: 'LineDegreeROADM'
-  line_connections:
-    - name: 'Line 1'
-      port: 1
-    - name: 'Line 3'
-      port: 2
-  express_connections:
-    - name: 'Add/Drop 1'
-      port: 1
-    - name: 'Add/Drop 2'
-      port: 2
+  line_connection: 'Line 3'
+  intra_connections:
+    port_1: 'Line 1'
+    port_2: 'Add/Drop 1'
 
 - name: 'Line 3'
   type: 'LineDegreeROADM'
-  line_connections:
-    - name: 'Line 1'
-      port: 1
-    - name: 'Line 2'
-      port: 2
-  express_connections:
-    - name: 'Add/Drop 1'
-      port: 1
-    - name: 'Add/Drop 2'
-      port: 2
+  line_connection: 'Line 2'
+  intra_connections:
+    port_1: 'Line 4'
+    port_2: 'Add/Drop 2'
+
+- name: 'Line 4'
+  type: 'LineDegreeROADM'
+  line_connection: 'Line 6'
+  intra_connections:
+    port_1: 'Line 3'
+    port_2: 'Add/Drop 2'
+
+- name: 'Line 5'
+  type: 'LineDegreeROADM'
+  line_connection: 'Line 1'
+  intra_connections:
+    port_1: 'Line 6'
+    port_2: 'Add/Drop 3'
+
+- name: 'Line 6'
+  type: 'LineDegreeROADM'
+  line_connection: 'Line 4'
+  intra_connections:
+    port_1: 'Line 5'
+    port_2: 'Add/Drop 3'
 
 - name: 'Client 1'
   type: 'Client'
-  client_connections:
-    - name: 'Add/Drop 1'
+  client_connection: 'Add/Drop 1'
 
 - name: 'Client 2'
   type: 'Client'
-  client_connections:
-    - name: 'Add/Drop 1'
+  client_connection: 'Add/Drop 2'
 
 - name: 'Client 3'
   type: 'Client'
-  client_connections:
-    - name: 'Add/Drop 2'
+  client_connection: 'Add/Drop 3'
+
+- name: 'Client 4'
+  type: 'Client'
+  client_connection: 'Add/Drop 3'
