@@ -29,6 +29,7 @@
   intra_connections:
     port_1: 'Line 2'
     port_2: 'Add/Drop 1'
+    port_3:
 
 - name: 'Line 2'
   type: 'LineDegreeROADM'
@@ -80,3 +81,7 @@
 - name: 'Client 4'
   type: 'Client'
   client_connection: 'Add/Drop 3'
+
+- name: 'New Client'
+  type: 'Client'
+  client_connection: 'Line 1'

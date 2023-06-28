@@ -6,28 +6,26 @@ Copyright (c) 2019 - present AppSeed.us
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import LineDegreeModel, AddDropModel, ClientModel
 
-from .models import Device
 
+# class LineDegreeForm(forms.ModelForm):
+#     class Meta:
+#         model = LineDegreeModel
+#         fields = ['name', 'description', 'latitude', 'longitude', 'ip_address']
+#         labels = {
+#             'name': 'Device Name',
+#             'description': 'Description',
+#             'latitude': 'Latitude',
+#             'longitude': 'Longitude',
+#             'ip_address': 'IP Address',
+#         }
 
-class DeviceForm(forms.ModelForm):
-    COLOR_CHOICES = [
-        ('red', 'Red'),
-        ('green', 'Green'),
-        ('blue', 'Blue'),
-    ]
+class LineDegreeForm(forms.ModelForm):
     name = forms.CharField(
         widget=forms.TextInput(
             attrs={
                 'placeholder': 'Device Name',
-                'class': 'form-control'
-            }
-        )
-    )
-    color = forms.ChoiceField(
-        choices=COLOR_CHOICES,
-        widget=forms.Select(
-            attrs={
                 'class': 'form-control'
             }
         )
@@ -74,8 +72,8 @@ class DeviceForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Device
-        fields = ('name', 'ip_address', 'color', 'description', 'latitude', 'longitude')
+        model = LineDegreeModel
+        fields = ('name', 'ip_address', 'description', 'latitude', 'longitude')
 
 
 class LoginForm(forms.Form):

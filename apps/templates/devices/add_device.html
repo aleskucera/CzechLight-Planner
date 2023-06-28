@@ -1,4 +1,5 @@
 {% extends "layouts/base.html" %}
+{% load static %} <!-- Add this line to load static files -->
 
 {% block title %} Add Device {% endblock %}
 
@@ -48,11 +49,6 @@
                                                 <div class="form-group">
                                                     {{ form.name.label_tag }}
                                                     {{ form.name }}
-                                                </div>
-
-                                                <div class="form-group">
-                                                    {{ form.color.label_tag }}
-                                                    {{ form.color }}
                                                 </div>
                                             </div>
                                             <div class="col-lg-12 col-xl-6">
@@ -112,6 +108,37 @@
                                         </button>
                                     </div>
                                 </div>
+
+                                <!-- Ports Section -->
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Ports</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="ports-container">
+                                            <div class="form-group port-entry">
+                                                <div class="row">
+                                                    <div class="col-lg-4">
+                                                        <label for="port">Port Number:</label>
+                                                        <select class="form-control port-number" name="port">
+                                                            <option value="1">1</option>
+                                                            <option value="2">2</option>
+                                                            <option value="3">3</option>
+                                                            <!-- Add more port options as needed -->
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-8">
+                                                        <label for="device_name">Connected Device:</label>
+                                                        <input type="text" class="form-control device-name"
+                                                               name="device_name">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-primary" id="add-port-btn">Add Intra Port
+                                        </button>
+                                    </div>
+                                </div>
                             </form>
                             <!-- [ Main Content ] end -->
                         </div>
@@ -131,70 +158,5 @@
           rel='stylesheet'/>
     <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js'></script>
 
-    <script>
-        mapboxgl.accessToken = 'pk.eyJ1IjoiYWxlc2t1Y2VyYSIsImEiOiJjbGc5OG0wd3MxNWI2M3NvOTIyMDJwdGV4In0.pLzkwEwCdgexkT_ai7yP8Q';
-
-        var map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/aleskucera/clg9at7fl001d01pe1mwrkvgl',
-            center: [15.251112431996722, 49.78450556341959], // Center of Czech Republic
-            zoom: 6
-        });
-
-        var geocoder = new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl,
-            marker: false,
-            language: 'cs',
-            placeholder: 'Enter your address'
-        });
-
-        // Add geocoder to the address field
-        document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
-        document.querySelector('.mapboxgl-ctrl-geocoder input').classList.add('form-control');
-
-        // Listen for result event on geocoder
-        geocoder.on('result', function (event) {
-            // Get selected address
-            var selectedAddress = event.result.place_name;
-
-            // Set selected address in input field
-            document.getElementById('geocoder').value = selectedAddress;
-
-            // Get latitude and longitude of selected address
-            var lngLat = event.result.center;
-
-            // Set latitude and longitude values in hidden input fields
-            document.getElementById('latitude').value = lngLat[1];
-            document.getElementById('longitude').value = lngLat[0];
-
-            // Show coordinates field
-            {#document.getElementById('coordinates_field').style.display = 'block';#}
-        });
-
-        // Hide coordinates field by default
-        document.getElementById('coordinates_field').style.display = 'none';
-
-        // Listen for checkbox change event
-        document.getElementById('use_coordinates').addEventListener('change', function () {
-            // If checkbox is checked, show coordinates field
-            if (this.checked) {
-                document.getElementById('address_field').style.display = 'none';
-                document.getElementById('coordinates_field').style.display = 'block';
-            } else { // Otherwise, hide coordinates field
-                document.getElementById('coordinates_field').style.display = 'none';
-                document.getElementById('address_field').style.display = 'block';
-            }
-        });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            var form = document.querySelector("#device-form");
-            form.addEventListener("keydown", function (event) {
-                if (event.keyCode === 13) {
-                    event.preventDefault();
-                    return false;
-                }
-            });
-        });
-    </script>
+    <script src="{% static 'assets/js/devices/add-device.js' %}"></script>
 {% endblock javascripts %}

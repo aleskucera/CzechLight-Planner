@@ -1,30 +1,33 @@
 from django.db import models
+from jsonfield import JSONField
 
 
-# Create your models here.
-
-class Device(models.Model):
-    name = models.CharField(max_length=255)
-    ip_address = models.GenericIPAddressField()
-    color = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+class DeviceModel(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
-    online = models.BooleanField(default=False)
+    ip_address = models.GenericIPAddressField()
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
 
-# class Node(models.Model):
-#     name = models.CharField(max_length=255)
-#     location = models.CharField(max_length=255)
-#     latitude = models.FloatField()
-#     longitude = models.FloatField()
-#     description = models.TextField(blank=True)
-#
-# class Device2(models.Model):
-#     name = models.CharField(max_length=255)
-#     type = models.CharField(max_length=255)
-#     ip_address = models.GenericIPAddressField()
-#     user = models.CharField(max_length=255)
-#     password = models.CharField(max_length=255)
-#     leaf_ports = models.TextField(blank=True)
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return self.__str__()
+
+    class Meta:
+        abstract = True
 
 
+class LineDegreeModel(DeviceModel):
+    line_conn = models.CharField(max_length=255, null=True, blank=True)
+    ports = JSONField(null=True, blank=True)
+
+
+class AddDropModel(DeviceModel):
+    ports = JSONField(null=True, blank=True)
+    client_conn = models.CharField(max_length=255, null=True, blank=True)
+
+
+class ClientModel(DeviceModel):
+    client_conn = models.CharField(max_length=255, null=True, blank=True)
