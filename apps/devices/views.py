@@ -47,6 +47,29 @@ def device_list(request):
 #
 #     return render(request, 'devices/device_list.html', {'devices': list(devices.values())})
 
+def device_create(request):
+    if request.method == 'POST':
+        form = DeviceForm(request.POST)
+        if form.is_valid():
+            device = form.save(commit=False)
+            device_type = request.POST.get('device-type')
+
+            # Set the device type specific fields
+            if device_type == 'lineDegree':
+                device.line_conn = request.POST.get('line_connection')
+                device.ports = request.POST.get('ports')
+            elif device_type == 'addDrop':
+                device.ports = request.POST.get('ports')
+                device.client_conn = request.POST.get('client_connection')
+            elif device_type == 'client':
+                device.client_conn = request.POST.get('client_connection')
+
+            device.save()
+            return redirect('devices:device-list')
+    else:
+        form = DeviceForm()
+    return render(request, 'devices/add_device.html', {'form': form})
+
 
 def line_degree_create(request):
     if request.method == 'POST':
