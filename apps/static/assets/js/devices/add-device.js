@@ -52,12 +52,5 @@ document.getElementById('use_coordinates').addEventListener('change', function (
     }
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-    var form = document.querySelector("#device-form");
-    form.addEventListener("keydown", function (event) {
-        if (event.keyCode === 13) {
-            event.preventDefault();
-            return false;
-        }
-    });
-});
+
+
