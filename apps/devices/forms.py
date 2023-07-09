@@ -4,28 +4,26 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
-from .models import LineDegreeModel, AddDropModel, ClientModel
+from .models import DeviceModel
+from apps.device_config import device_types
 
 
-# class LineDegreeForm(forms.ModelForm):
-#     class Meta:
-#         model = LineDegreeModel
-#         fields = ['name', 'description', 'latitude', 'longitude', 'ip_address']
-#         labels = {
-#             'name': 'Device Name',
-#             'description': 'Description',
-#             'latitude': 'Latitude',
-#             'longitude': 'Longitude',
-#             'ip_address': 'IP Address',
-#         }
-
-class LineDegreeForm(forms.ModelForm):
+class DeviceForm(forms.ModelForm):
     name = forms.CharField(
         widget=forms.TextInput(
             attrs={
                 'placeholder': 'Device Name',
+                'class': 'form-control'
+            }
+        )
+    )
+    # Create choices for the device type field. Also add the placeholder.
+    device_type = forms.ChoiceField(
+        label='Device Type',
+        choices=[('placeholder', 'Select Device Type')] + device_types,
+        widget=forms.Select(
+            attrs={
+                'id': 'device-type',
                 'class': 'form-control'
             }
         )
@@ -42,6 +40,7 @@ class LineDegreeForm(forms.ModelForm):
     )
 
     description = forms.CharField(
+        required=False,
         widget=forms.Textarea(
             attrs={
                 'placeholder': 'Device Description',
@@ -72,57 +71,5 @@ class LineDegreeForm(forms.ModelForm):
     )
 
     class Meta:
-        model = LineDegreeModel
+        model = DeviceModel
         fields = ('name', 'ip_address', 'description', 'latitude', 'longitude')
-
-
-class LoginForm(forms.Form):
-    username = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                "placeholder": "Username",
-                "class": "form-control"
-            }
-        ))
-    password = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={
-                "placeholder": "Password",
-                "class": "form-control"
-            }
-        ))
-
-
-class SignUpForm(UserCreationForm):
-    username = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                "placeholder": "Username",
-                "class": "form-control"
-            }
-        ))
-    email = forms.EmailField(
-        widget=forms.EmailInput(
-            attrs={
-                "placeholder": "Email",
-                "class": "form-control"
-            }
-        ))
-    password1 = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={
-                "placeholder": "Password",
-                "class": "form-control"
-            }
-        ))
-    password2 = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={
-                "placeholder": "Password check",
-                "class": "form-control"
-            }
-        ))
-
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password1', 'password2')

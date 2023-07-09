@@ -1,0 +1,190 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %} Find Path {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+    <style>
+        .color-box {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 5px;
+            border: 1px solid #ccc;
+            vertical-align: middle;
+        }
+    </style>
+{% endblock stylesheets %}
+
+
+{% block content %}
+    <section class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+                    <!-- [ breadcrumb ] start -->
+                    <div class="page-header">
+                        <div class="page-block">
+                            <div class="row align-items-center">
+                                <div class="col-md-12">
+                                    <div class="page-header-title">
+                                        <h5 class="m-b-10">Find Path</h5>
+                                    </div>
+                                    <ul class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a href="javascript:">Find Path</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ breadcrumb ] end -->
+
+                    <div class="main-body">
+                        <div class="page-wrapper">
+
+                            <!-- [ Main Content ] start -->
+                            <div class="card">
+                                {#                                <div class="card-header">#}
+                                {#                                    <h5>Find Path</h5>#}
+                                {#                                </div>#}
+
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="source">Source</label>
+                                            <div class="color-box" id="source-color"></div>
+                                            <!-- Added source color box -->
+                                            <select class="form-control" id="source">
+                                                <option value="">-- Select source --</option>
+                                                {% for device in devices %}
+                                                    <option value="{{ device.id }}">{{ device.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="destination">Destination</label>
+                                            <div class="color-box" id="destination-color"></div>
+                                            <!-- Added destination color box -->
+                                            <select class="form-control" id="destination">
+                                                <option value="">-- Select destination --</option>
+                                                {% for device in devices %}
+                                                    <option value="{{ device.id }}">{{ device.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <div id="map" style="width: 100%; height: 500px;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-primary" id="calculate-btn">Calculate Path</button>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <h5>Path:</h5>
+                                            <p id="path-result"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ Main Content ] end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block javascripts %}
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css' rel='stylesheet'/>
+    <link href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css'
+          rel='stylesheet'/>
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js'></script>
+
+    <script>
+        // Access token for Mapbox API
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYWxlc2t1Y2VyYSIsImEiOiJjbGc5OG0wd3MxNWI2M3NvOTIyMDJwdGV4In0.pLzkwEwCdgexkT_ai7yP8Q';
+
+        // Create map
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/aleskucera/clg9at7fl001d01pe1mwrkvgl',
+            center: [15.251112431996722, 49.78450556341959], // Center of Czech Republic
+            zoom: 6
+        });
+
+        const source = document.getElementById('source');
+        const destination = document.getElementById('destination');
+        const calculateBtn = document.getElementById('calculate-btn');
+
+        const srcMarker = new mapboxgl.Marker({color: '#00ff00'});
+        const dstMarker = new mapboxgl.Marker({color: '#0000ff'});
+
+
+        function updateMap() {
+            if (source.value) {
+                getCoordinates(source.value).then(coordinates => {
+                    srcMarker.setLngLat(coordinates);
+                    srcMarker.addTo(map);
+                    document.getElementById('source-color').style.backgroundColor = srcMarker._color; // Set source color
+                    document.getElementById('source-color').style.display = 'inline-block'; // Show source color box
+                });
+            } else {
+                srcMarker.remove();
+                document.getElementById('source-color').style.display = 'none'; // Hide source color box
+            }
+
+            if (destination.value) {
+                getCoordinates(destination.value).then(coordinates => {
+                    dstMarker.setLngLat(coordinates);
+                    dstMarker.addTo(map);
+                    document.getElementById('destination-color').style.backgroundColor = dstMarker._color; // Set destination color
+                    document.getElementById('destination-color').style.display = 'inline-block'; // Show destination color box
+                });
+            } else {
+                dstMarker.remove();
+                document.getElementById('destination-color').style.display = 'none'; // Hide destination color box
+            }
+        }
+
+        async function getCoordinates(deviceId) {
+            const response = await fetch('/api/device/' + deviceId + '/');
+            const data = await response.json();
+            return [data.longitude, data.latitude];
+        }
+
+
+        // Function to calculate the path
+        function calculatePath() {
+            // Make AJAX request to the Django view
+            $.ajax({
+                type: 'POST',
+                url: '/find/',
+                data: {
+                    'source': source.value,
+                    'destination': destination.value
+                },
+                success: function (response) {
+                    document.getElementById('path-result').textContent = response.result;
+                },
+                error: function (xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        }
+
+        // Button click event to calculate path
+        calculateBtn.addEventListener('click', calculatePath);
+        destination.addEventListener('change', updateMap);
+        source.addEventListener('change', updateMap);
+    </script>
+{% endblock javascripts %}

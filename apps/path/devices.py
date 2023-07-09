@@ -1,9 +1,17 @@
-from .models import DeviceModel
+from apps.devices.models import DeviceModel
+
 
 class Device(object):
     def __init__(self, device_model: DeviceModel):
-        self.name = device_model.name
         self.device_model = device_model
+
+        self.id = device_model.id
+        self.name = device_model.name
+
+        self.latitude = device_model.latitude
+        self.longitude = device_model.longitude
+        self.ip_address = device_model.ip_address
+        self.description = device_model.description
 
     def neighbors(self, in_connection: str = None):
         raise NotImplementedError
@@ -25,18 +33,14 @@ class LineDegreeROADM(Device):
     def __init__(self, device_model: DeviceModel):
         super().__init__(device_model)
         self.line_conn = None
-        self.intra_conn = {f'port_{i + 1}': None for i in range(4)}
-
-    @property
-    def num_intra_conn(self):
-        return len([d for d in self.intra_conn.values() if d is not None])
+        self.intra_conn = dict()
 
     def neighbors(self, in_connection: str = None):
         devices, connection_types = [], []
 
         if in_connection == 'LineConnection' or in_connection is None:
-            devices.extend([d for d in self.intra_conn.values() if d is not None])
-            connection_types.extend(['IntraConnection'] * self.num_intra_conn)
+            devices.extend(self.intra_conn.values())
+            connection_types.extend(['IntraConnection'] * len(self.intra_conn))
 
         if in_connection == 'IntraConnection' or in_connection is None:
             devices.append(self.line_conn)
@@ -45,59 +49,50 @@ class LineDegreeROADM(Device):
         return devices, connection_types
 
     def create_connections(self, devices: dict):
-        if self.device_model.line_conn is not None and self.device_model.line_conn in devices:
-            self.line_conn = devices[self.device_model.line_conn]
+        intra_conns = self.device_model.connections['multi_intra']
+        line_conn_name = self.device_model.connections['single_line']
 
-        intra_conns = {f'port_{i+1}': getattr(self.device_model, f'intra_port_{i + 1}') for i in range(4)}
+        # Create the line connection
+        self.line_conn = devices[line_conn_name] if line_conn_name in devices else None
+
+        # Create the intra connections
         for port, device_name in intra_conns.items():
-            if device_name is not None and device_name in devices:
+            if device_name in devices:
                 self.intra_conn[port] = devices[device_name]
-            else:
-                self.intra_conn[port] = None
-
 
 
 class AddDropROADM(Device):
     def __init__(self, device_model: DeviceModel):
         super().__init__(device_model)
-        self.intra_conn = {f'port_{i + 1}': None for i in range(4)}
-        self.client_conn = {f'port_{i + 1}': None for i in range(4)}
-
-    @property
-    def num_intra_conn(self):
-        return len([d for d in self.intra_conn.values() if d is not None])
-
-    @property
-    def num_client_conn(self):
-        return len([d for d in self.client_conn.values() if d is not None])
+        self.intra_conn = dict()
+        self.client_conn = dict()
 
     def neighbors(self, in_connection: str = None):
         devices, connection_types = [], []
 
         if in_connection == 'IntraConnection' or in_connection is None:
-            devices.extend([d for d in self.client_conn.values() if d is not None])
-            connection_types.extend(['ClientConnection'] * self.num_client_conn)
+            devices.extend(self.client_conn.values())
+            connection_types.extend(['ClientConnection'] * len(self.client_conn))
 
         if in_connection == 'ClientConnection' or in_connection is None:
-            devices.extend([d for d in self.intra_conn.values() if d is not None])
-            connection_types.extend(['IntraConnection'] * self.num_intra_conn)
+            devices.extend(self.intra_conn.values())
+            connection_types.extend(['IntraConnection'] * len(self.intra_conn))
 
         return devices, connection_types
 
     def create_connections(self, devices: dict):
-        intra_conns = {f'port_{i+1}': getattr(self.device_model, f'intra_port_{i + 1}') for i in range(4)}
-        for port, device_name in intra_conns.items():
-            if device_name is not None and device_name in devices:
-                self.intra_conn[port] = devices[device_name]
-            else:
-                self.intra_conn[port] = None
+        intra_conns = self.device_model.connections['multi_intra']
+        client_conns = self.device_model.connections['multi_client']
 
-        client_conns = {f'port_{i+1}': getattr(self.device_model, f'client_port_{i + 1}') for i in range(4)}
+        # Create the intra connections
+        for port, device_name in intra_conns.items():
+            if device_name in devices:
+                self.intra_conn[port] = devices[device_name]
+
+        # Create the client connections
         for port, device_name in client_conns.items():
-            if device_name is not None and device_name in devices:
+            if device_name in devices:
                 self.client_conn[port] = devices[device_name]
-            else:
-                self.client_conn[port] = None
 
 
 class Client(Device):
@@ -115,8 +110,8 @@ class Client(Device):
         return devices, connection_types
 
     def create_connections(self, devices: dict):
-        if self.device_model.client_conn is not None and self.device_model.client_conn in devices:
-            self.client_conn = devices[self.device_model.client_conn]
+        client_conn_name = self.device_model.connections['single_client']
+        self.client_conn = devices[client_conn_name] if client_conn_name in devices else None
 
 
 if __name__ == '__main__':

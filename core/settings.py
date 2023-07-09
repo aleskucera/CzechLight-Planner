@@ -39,9 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.home',  # Enable the inner home (home)
+    'apps.home',
     'apps.devices',
-    'debug_toolbar',
+    'apps.path',
+    'apps.authentication',
     'jsonfield',
 ]
 
@@ -54,7 +55,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'

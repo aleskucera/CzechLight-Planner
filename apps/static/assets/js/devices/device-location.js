@@ -1,15 +1,16 @@
-// Place your JavaScript code here
-
+// Access token for Mapbox API
 mapboxgl.accessToken = 'pk.eyJ1IjoiYWxlc2t1Y2VyYSIsImEiOiJjbGc5OG0wd3MxNWI2M3NvOTIyMDJwdGV4In0.pLzkwEwCdgexkT_ai7yP8Q';
 
-var map = new mapboxgl.Map({
+
+// Create map
+const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/aleskucera/clg9at7fl001d01pe1mwrkvgl',
     center: [15.251112431996722, 49.78450556341959], // Center of Czech Republic
     zoom: 6
 });
 
-var geocoder = new MapboxGeocoder({
+const geocoder = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
     mapboxgl: mapboxgl,
     marker: false,
@@ -51,6 +52,3 @@ document.getElementById('use_coordinates').addEventListener('change', function (
         document.getElementById('address_field').style.display = 'block';
     }
 });
-
-
-

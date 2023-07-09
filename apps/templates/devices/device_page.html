@@ -23,11 +23,16 @@
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-md-5">
-                                                    <h5>Properties</h5>
-                                                    <hr>
                                                     <form method="post">
                                                         {% csrf_token %}
                                                         {{ form.as_p }}
+
+                                                        <!-- Add the connection as the text field json -->
+                                                        <div class="form-group">
+                                                            <label for="connection">Connection</label>
+                                                            <textarea class="form-control" name="connection"
+                                                                      rows="3">{{ device.connections }}</textarea>
+                                                        </div>
                                                         <button type="submit" class="btn btn-primary">Save</button>
                                                     </form>
                                                 </div>
