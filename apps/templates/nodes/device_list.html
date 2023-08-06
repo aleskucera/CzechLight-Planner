@@ -1,0 +1,88 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+
+{% block title %} Device List {% endblock %}
+
+{% block content %}
+    <section class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+
+                    <!-- [ breadcrumb ] start -->
+                    <div class="page-header">
+                        <div class="page-block">
+                            <div class="row align-items-center">
+                                <div class="col-md-12">
+                                    <div class="page-header-title">
+                                        <h5 class="m-b-10">Device List</h5>
+                                    </div>
+                                    <ul class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a href="javascript:">Device List</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ breadcrumb ] end -->
+
+                    <!-- [ Main Content ] start -->
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <div class="row">
+
+                                <!-- [ Devices Table ] start -->
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Devices</h5>
+                                        </div>
+                                        <div class="table-border-style">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Name</th>
+                                                        <th>Type</th>
+                                                        <th>Subtype</th>
+                                                        <th>Description</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for device in devices %}
+                                                        <tr class="clickable"
+                                                            onclick="window.location='/device/{{ device.id }}/'">
+                                                            <th scope="row">{{ device.id }}</th>
+                                                            <td>{{ device.name }}</td>
+                                                            <td>{{ device.type }}</td>
+                                                            <td>{{ device.subtype }}</td>
+                                                            <td>{{ device.description }}</td>
+                                                        </tr>
+                                                    {% empty %}
+                                                        <tr>
+                                                            <td colspan="4">No devices found.</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- [ Devices Table ] end -->
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block javascripts %}{% endblock javascripts %}

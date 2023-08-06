@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.home',
-    'apps.devices',
-    'apps.path',
+    'apps.nodes',
+    'apps.connection',
     'apps.authentication',
     'jsonfield',
 ]
@@ -61,10 +61,6 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 CELERY_BEAT_SCHEDULE = {
-    # 'print-message-every-minute': {
-    #     'task': 'apps.devices.tasks.print_message',
-    #     'schedule': 10.0,
-    # },
     'update-device-online-status-every-minute': {
         'task': 'apps.devices.tasks.update_device_online_status',
         'schedule': 30.0,

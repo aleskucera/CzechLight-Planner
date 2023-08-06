@@ -3,7 +3,7 @@
 
 <head>
     <title>
-        Django Datta Able - {% block title %}{% endblock %} | AppSeed
+        CzechLight Planner - {% block title %}{% endblock %}
     </title>
     <!-- HTML5 Shim and Respond.js IE11 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -40,25 +40,25 @@
 </head>
 <body>
 
-    <!-- [ Pre-loader ] start -->
-    <div class="loader-bg">
-        <div class="loader-track">
-            <div class="loader-fill"></div>
-        </div>
+<!-- [ Pre-loader ] start -->
+<div class="loader-bg">
+    <div class="loader-track">
+        <div class="loader-fill"></div>
     </div>
-    <!-- [ Pre-loader ] End -->
+</div>
+<!-- [ Pre-loader ] End -->
 
-    {% include 'includes/sidebar.html' %}
+{% include 'includes/sidebar.html' %}
 
-    {% include 'includes/navigation.html' %}
+{% include 'includes/navigation.html' %}
 
 
-    {% block content %}{% endblock content %}
+{% block content %}{% endblock content %}
 
-    {% include 'includes/scripts.html' %}
+{% include 'includes/scripts.html' %}
 
-    <!-- Specific Page JS goes HERE  -->
-    {% block javascripts %}{% endblock javascripts %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
 
 </body>
 </html>

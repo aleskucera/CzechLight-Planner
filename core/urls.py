@@ -12,8 +12,8 @@ urlpatterns = [
     path("", include("apps.authentication.urls")),  # Auth routes - login / register
 
     # ADD NEW Routes HERE
-    path("", include("apps.devices.urls")),
-    path("", include("apps.path.urls")),
+    path("", include("apps.nodes.urls")),
+    path("", include("apps.connection.urls")),
 
     # Leave `Home.Urls` as last the last line
     path("", include("apps.home.urls"))

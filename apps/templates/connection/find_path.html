@@ -1,0 +1,218 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %} Find Path {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+    <style>
+        /* CSS for the tooltip */
+        .tooltip {
+            position: absolute;
+            background-color: #f9f9f9;
+            border: 1px solid #d3d3d3;
+            border-radius: 5px;
+            padding: 8px;
+            pointer-events: none;
+        }
+
+        /* Add shadow effect to node text */
+        .node-text {
+            --stroke-color: white;
+            --stroke-width: 1px;
+            fill: black;
+            text-shadow: var(--stroke-width) 0 0 var(--stroke-color),
+            calc(var(--stroke-width) * -1) 0 0 var(--stroke-color),
+            0 var(--stroke-width) 0 var(--stroke-color),
+            0 calc(var(--stroke-width) * -1) 0 var(--stroke-color);
+            font-size: 12px;
+            font-weight: bold;
+            pointer-events: none; /* Ensure text doesn't interfere with mouse interactions */
+        }
+    </style>
+{% endblock stylesheets %}
+
+
+{% block content %}
+    <section class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+                    <!-- [ breadcrumb ] start -->
+                    <div class="page-header">
+                        <div class="page-block">
+                            <div class="row align-items-center">
+                                <div class="col-md-12">
+                                    <div class="page-header-title">
+                                        <h5 class="m-b-10">Find Path</h5>
+                                    </div>
+                                    <ul class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a href="javascript:">Find Path</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ breadcrumb ] end -->
+
+                    <div class="main-body">
+                        <div class="page-wrapper">
+
+                            <!-- [ Main Content ] start -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="tp-a">Termination Point A</label>
+                                            <select class="form-control" id="tp-a">
+                                                <option value="">-- Select Termination Point --</option>
+                                                {% for tp in termination_points %}
+                                                    <option value="{{ tp.id }}">{{ tp.name }}
+                                                        - {{ tp.description }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="tp-b">Termination Point B</label>
+                                            <select class="form-control" id="tp-b">
+                                                <option value="">-- Select Termination Point --</option>
+                                                {% for tp in termination_points %}
+                                                    <option value="{{ tp.id }}">{{ tp.name }}
+                                                        - {{ tp.description }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <div id="map" style="width: 100%; height: 500px;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <svg id="graph" width="100%" height="500"></svg>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-primary" id="compute-btn">Compute Connection
+                                                Options
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <h5>Path:</h5>
+                                            <p id="path-result"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ Main Content ] end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block javascripts %}
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css' rel='stylesheet'/>
+    <link href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css'
+          rel='stylesheet'/>
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js'></script>
+    <script src="{% static 'assets/js/map/main.js' %}"></script>
+    <script src="{% static 'assets/js/graph/main.js' %}"></script>
+    <script src="{% static 'assets/js/map/network.js' %}"></script>
+
+    <script>
+        const graphData = {{ graph_data|safe }};
+        const mapData = {{ map_data|safe }};
+        let simulation = graphSimulation(graphData, [400, 300]);
+        updateGraph(graphData);
+        const tpA = document.getElementById('tp-a');
+        const tpB = document.getElementById('tp-b');
+        const calculateBtn = document.getElementById('compute-btn');
+        const map = createMap('map', [15.251112431996722, 49.78450556341959], 6);
+
+        function updateGraph(graphData) {
+            simulation.stop();
+            d3.select("#graph").selectAll("*").remove();
+            simulation = graphSimulation(graphData, [400, 300]);
+            const {svg, link, node, nodeText} = svgElements(graphData, '#graph');
+
+            // Set up tick event for the simulation
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+
+                node
+                    .attr("cx", d => d.x)
+                    .attr("cy", d => d.y);
+
+                // Update the text position for node names
+                nodeText
+                    .attr("x", d => d.x + 12) // Adjust the 'x' position as needed
+                    .attr("y", d => d.y + 5); // Adjust the 'y' position as needed
+            });
+        }
+
+        // Wait for the map style to load
+        map.on('load', () => {
+            console.log('Map style loaded');
+            {#setTimeout(() => {#}
+            {#    drawLinks(map, mapData['links'], '#6e6f73', 3);}, 100);#}
+            setTimeout(() => {
+                drawClusteredNodes(map, mapData['nodes']);
+            }, 100);
+        });
+
+        // Function to update the map with the path visualization
+        function updateMap(mapData) {
+            console.log('Updating map');
+            setTimeout(() => {
+                drawLinks(map, mapData['links'], '#6e6f73', 3);
+            }, 100);
+            setTimeout(() => {
+                drawClusteredNodes(map, mapData['nodes']);
+            }, 100);
+        }
+
+        // Function to handle the AJAX request and update the graph and map
+        function computeConnection() {
+            // Make AJAX request to the Django view
+            $.ajax({
+                type: 'POST',
+                url: '/find-path/',
+                data: {
+                    'source': tpA.value,
+                    'destination': tpB.value
+                },
+                success: function (response) {
+                    document.getElementById('path-result').textContent = response['path-text'];
+
+                    // Update the graph visualization with the new data
+                    updateGraph(response['graph-data']);
+
+                    console.log('Calling updateMap');
+                    // Update the map visualization with the new data
+                    {#updateMap(response['map-data']);#}
+                },
+                error: function (xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        }
+
+        // Button click event to calculate path
+        calculateBtn.addEventListener('click', computeConnection);
+    </script>
+{% endblock javascripts %}

@@ -1,0 +1,270 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %} Add Device {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+                    <!-- [ breadcrumb ] start -->
+                    <div class="page-header">
+                        <div class="page-block">
+                            <div class="row align-items-center">
+                                <div class="col-md-12">
+                                    <div class="page-header-title">
+                                        <h5 class="m-b-10">Add New Device</h5>
+                                    </div>
+                                    <ul class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a href="javascript:">Add New Device</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ breadcrumb ] end -->
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <!-- [ Main Content ] start -->
+                            <form method="post" id="device-form">
+                                {% csrf_token %}
+                                <div class="card">
+
+                                    <div class="card-header">
+                                        <h5>Basic Attributes</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-xl-6">
+                                                <div class="form-group">
+                                                    {{ form.name.label_tag }}
+                                                    {{ form.name }}
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-xl-6">
+                                                <div class="form-group">
+                                                    {{ form.description.label_tag }}
+                                                    {{ form.description }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Location</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <label for="use_coordinates">Use Coordinates:</label>
+                                        <input type="checkbox" id="use_coordinates"
+                                               name="use_coordinates">
+                                        <br>
+                                        <br>
+                                        <div id="address_field" class="form-group">
+                                            <label for="geocoder">Address:</label>
+
+                                            <div id="geocoder"></div>
+                                            <br>
+                                            <div id="map" style="height: 400px;"></div>
+                                        </div>
+
+                                        <div id="coordinates_field" class="form-group"
+                                             style="display:none;">
+                                            <div class="row">
+                                                <div class="col-lg-12 col-xl-6">
+                                                    {{ form.latitude.label_tag }}
+                                                    {{ form.latitude }}
+                                                </div>
+                                                <div class="col-lg-12 col-xl-6">
+                                                    {{ form.longitude.label_tag }}
+                                                    {{ form.longitude }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Network</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            {{ form.ip_address.label_tag }}
+                                            {{ form.ip_address }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Connection Section -->
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Connections</h5>
+                                    </div>
+
+                                    <!-- Ports Section -->
+                                    <div class="card-body">
+
+                                        <!-- Device Type -->
+                                        <div class="form-group">
+                                            {{ form.device_type.label_tag }}
+                                            {{ form.device_type }}
+                                        </div>
+
+                                        <!-- Line Connections -->
+                                        <div id="line-conn-container" class="connections-container"
+                                             style="display: none">
+                                            <div class="row col-lg-12" style="margin-top: 40px;">
+                                                <h5>Line Connections</h5>
+                                            </div>
+                                            <hr>
+
+                                            <!-- One line connection -->
+                                            <div id="one-line-conn" class="row col-lg-12">
+                                                <label for="line-connection">Line Connection</label>
+                                                <input type="text" class="form-control" name="line-connection">
+                                            </div>
+
+                                            <!-- Multiple line connections -->
+                                            <div id="multiple-line-conn" class="row multi-connection">
+                                                <div class="col-lg-4">
+                                                    <label for="line-port">Port Number:</label>
+                                                    <select class="form-control line-port-number" id="line-port"
+                                                            name="line-port">
+                                                        <!-- Port options will be dynamically added here -->
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-8">
+                                                    <label for="line-device-name">Connected Device:</label>
+                                                    <input type="text" class="form-control device-name"
+                                                           name="line-device-name">
+                                                </div>
+                                            </div>
+                                            <div class="row col-lg-12 mt-3">
+                                                <button id="add-line-connection" type="button"
+                                                        class="btn btn-secondary add-conn" data-conn-type="line">
+                                                    Add Line Connection
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Intra Connections -->
+                                        <div id="intra-conn-container" class="connections-container"
+                                             style="display: none">
+                                            <div class="row col-lg-12" style="margin-top: 40px;">
+                                                <h5>Intra Connections</h5>
+                                            </div>
+                                            <hr>
+                                            <!-- One intra connection -->
+                                            <div id="one-intra-conn" class="row col-lg-12">
+                                                <label for="intra-connection">Intra Connection</label>
+                                                <input type="text" class="form-control" name="intra-connection">
+                                            </div>
+
+                                            <!-- Multiple intra connections -->
+                                            <div id="multiple-intra-conn" class="row multi-connection">
+                                                <div class="col-lg-4">
+                                                    <label for="intra-port">Port Number:</label>
+                                                    <select class="form-control intra-port-number"
+                                                            name="intra-port">
+                                                        <!-- Port options will be dynamically added here -->
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-8">
+                                                    <label for="intra-device-name">Connected Device:</label>
+                                                    <input type="text" class="form-control device-name"
+                                                           name="intra-device-name">
+                                                </div>
+                                            </div>
+                                            <div class="row col-lg-12 mt-3">
+                                                <button id="add-intra-connection" type="button"
+                                                        class="btn btn-secondary add-conn" data-conn-type="intra">
+                                                    Add Intra Connection
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Client Connections -->
+                                        <div id="client-conn-container" class="connections-container"
+                                             style="display: none">
+                                            <div class="row col-lg-12" style="margin-top: 40px;">
+                                                <h5>Client Connections</h5>
+                                            </div>
+                                            <hr>
+                                            <!-- One client connection -->
+                                            <div id="one-client-conn" class="row col-lg-12">
+                                                <label for="client-connection">Client Connection</label>
+                                                <input type="text" class="form-control" name="client-connection">
+                                            </div>
+
+                                            <!-- Multiple client connections -->
+                                            <div id="multiple-client-conn" class="row multi-connection">
+                                                <div class="col-lg-4">
+                                                    <label for="client-port">Port Number:</label>
+                                                    <select class="form-control client-port-number"
+                                                            name="client-port">
+                                                        <!-- Port options will be dynamically added here -->
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-8">
+                                                    <label for="client-device-name">Connected Device:</label>
+                                                    <input type="text" class="form-control device-name"
+                                                           name="client-device-name">
+                                                </div>
+                                            </div>
+                                            <div class="row col-lg-12 mt-3">
+                                                <button id="add-client-connection" type="button"
+                                                        class="btn btn-secondary add-conn" data-conn-type="client">
+                                                    Add Client Connection
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End Connection Section -->
+
+                                <!-- Submit Button -->
+                                <div class="card">
+                                    <div class="card-body">
+                                        <button type="submit" name="add-device" class="btn btn-primary">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- End Submit Button -->
+
+                            </form>
+                            <!-- [ Main Content ] end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+{% block javascripts %}
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css' rel='stylesheet'/>
+    <link href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css'
+          rel='stylesheet'/>
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js'></script>
+
+    <script>
+        var devicePorts = JSON.parse('{{ device_ports|escapejs }}');
+        console.log(devicePorts);
+    </script>
+
+    <script src="{% static 'assets/js/devices/device-location.js' %}"></script>
+    <script src="{% static 'assets/js/devices/device-ports.js' %}"></script>
+{% endblock javascripts %}
