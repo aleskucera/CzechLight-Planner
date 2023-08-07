@@ -168,8 +168,9 @@
         // Wait for the map style to load
         map.on('load', () => {
             console.log('Map style loaded');
-            {#setTimeout(() => {#}
-            {#    drawLinks(map, mapData['links'], '#6e6f73', 3);}, 100);#}
+            setTimeout(() => {
+                drawLinks(map, mapData['links'], '#6e6f73', 3);
+            }, 100);
             setTimeout(() => {
                 drawClusteredNodes(map, mapData['nodes']);
             }, 100);
@@ -178,12 +179,8 @@
         // Function to update the map with the path visualization
         function updateMap(mapData) {
             console.log('Updating map');
-            setTimeout(() => {
-                drawLinks(map, mapData['links'], '#6e6f73', 3);
-            }, 100);
-            setTimeout(() => {
-                drawClusteredNodes(map, mapData['nodes']);
-            }, 100);
+            drawLinks(map, mapData['links'], '#6e6f73', 3);
+            drawClusteredNodes(map, mapData['nodes']);
         }
 
         // Function to handle the AJAX request and update the graph and map
@@ -198,13 +195,8 @@
                 },
                 success: function (response) {
                     document.getElementById('path-result').textContent = response['path-text'];
-
-                    // Update the graph visualization with the new data
                     updateGraph(response['graph-data']);
-
-                    console.log('Calling updateMap');
-                    // Update the map visualization with the new data
-                    {#updateMap(response['map-data']);#}
+                    updateMap(response['map-data']);
                 },
                 error: function (xhr, errmsg, err) {
                     console.log(xhr.status + ": " + xhr.responseText);

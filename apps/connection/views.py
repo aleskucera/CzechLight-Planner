@@ -118,6 +118,7 @@ def get_path(request):
         for i in range(len(connection.main_path['devices']) - 1):
             dev_a = connection.main_path['devices'][i]
             dev_b = connection.main_path['devices'][i + 1]
+
             for link in graph_data['links']:
                 if link['source'] == dev_a and link['target'] == dev_b:
                     link['selected'] = True
@@ -132,7 +133,6 @@ def get_path(request):
 
         response = {
             'path-text': str(connection.main_path),
-            'path-devices': connection.main_path['devices'],
             'graph-data': graph_data,
             'map-data': map_data,
         }

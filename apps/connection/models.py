@@ -9,6 +9,7 @@ class Connection(models.Model):
     alternative_paths = JSONField(null=True, blank=True)
     termination_points = models.ManyToManyField(TerminationPoint, related_name='termination_points')
 
+    @property
     def name(self):
         """ Order the termination points in alphabetical order and return the name. """
         termination_points = sorted([tp.name for tp in self.termination_points.all()])
@@ -17,7 +18,7 @@ class Connection(models.Model):
         return ' - '.join(termination_points)
 
     def __str__(self):
-        return f'Connection: {self.name()}'
+        return f'Connection: {self.name}'
 
     def __repr__(self):
         return self.__str__()

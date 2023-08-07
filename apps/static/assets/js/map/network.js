@@ -96,7 +96,6 @@ function drawClusteredNodes(map, nodeData) {
 function drawLinks(map, linkData, color = '#000000', lineWidth = 2) {
     const sourceId = 'device-lines-source';
     const layerIdDLines = 'device-lines';
-    console.log('Draw Links');
 
     const lineFeatures = [];
     for (const link of linkData) {
@@ -105,11 +104,12 @@ function drawLinks(map, linkData, color = '#000000', lineWidth = 2) {
             geometry: {
                 type: 'LineString',
                 coordinates: [link['source_coords'], link['target_coords']],
+            },
+            properties: {
+                selected: link['selected'],
             }
         });
-        // console.log(link);
     }
-    // console.log(lineFeatures);
 
     if (map.getLayer(layerIdDLines)) {
         map.removeLayer(layerIdDLines);
@@ -132,7 +132,12 @@ function drawLinks(map, linkData, color = '#000000', lineWidth = 2) {
         type: 'line',
         source: sourceId,
         paint: {
-            'line-color': color,
+            'line-color': [
+                'case',
+                ['boolean', ['get', 'selected'], false],
+                '#00FF00', // Green color for selected links
+                color, // Default color for non-selected links
+            ],
             'line-width': lineWidth, // Adjust the width of the lines as needed
         },
     });
@@ -231,7 +236,7 @@ function drawLinks(map, linkData, color = '#000000', lineWidth = 2) {
 //         },
 //     });
 // }
-//
+
 // function drawLinksOld(map, nodeCoordinates, layer = 0, color = '#000000', lineWidth = 2) {
 //     const sourceId = 'device-lines-source-' + layer;
 //     const layerIdDLines = 'device-lines-' + layer;
