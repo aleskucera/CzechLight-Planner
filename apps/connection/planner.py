@@ -31,9 +31,9 @@ def find_path(source: TerminationPoint, destination: TerminationPoint, nodes: li
         current_state = frontier.popleft()
         if current_state.is_target(destination):
             counter += 1
-            # if connection.main_path is None:
-            connection.main_path = current_state.construct_path()
-            connection.alternative_paths[f'path_{counter}'] = current_state.construct_path()
+            if connection.main_path is None:
+                connection.main_path = current_state.construct_path()
+            connection.alternative_paths[counter] = current_state.construct_path()
             if counter >= 3:
                 break
 

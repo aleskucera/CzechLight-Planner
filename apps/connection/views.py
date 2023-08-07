@@ -1,4 +1,6 @@
 import json
+from copy import deepcopy
+
 from django.http import JsonResponse
 from apps.nodes.models import Device, TerminationPoint
 from django.views.decorators.csrf import csrf_exempt
@@ -98,6 +100,37 @@ def get_map_data(devices: list) -> dict:
     return graph_data
 
 
+def select_path(path: dict, graph_data: dict, map_data: dict) -> tuple:
+    """Selects the links in the path in the graph and map data.
+
+    Parameters:
+        path (dict): A dictionary containing the path information.
+        graph_data (dict): A dictionary containing the nodes and links for the network graph.
+        map_data (dict): A dictionary containing the nodes and links for the network graph in map.
+
+    Returns:
+        tuple: A tuple containing the graph and map data with the links in the path selected.
+    """
+
+    for i in range(len(path['devices']) - 1):
+        dev_a = path['devices'][i]
+        dev_b = path['devices'][i + 1]
+
+        for link in graph_data['links']:
+            if link['source'] == dev_a and link['target'] == dev_b:
+                link['selected'] = True
+            elif link['source'] == dev_b and link['target'] == dev_a:
+                link['selected'] = True
+
+        for link in map_data['links']:
+            if link['source'] == dev_a and link['target'] == dev_b:
+                link['selected'] = True
+            elif link['source'] == dev_b and link['target'] == dev_a:
+                link['selected'] = True
+
+    return graph_data, map_data
+
+
 @csrf_exempt
 def get_path(request):
     devices = Device.objects.all()
@@ -115,30 +148,41 @@ def get_path(request):
 
         connection = find_path(source, destination, nodes)
 
-        for i in range(len(connection.main_path['devices']) - 1):
-            dev_a = connection.main_path['devices'][i]
-            dev_b = connection.main_path['devices'][i + 1]
+        response = dict()
+        for name, path in connection.alternative_paths.items():
+            graph_data, map_data = select_path(path, deepcopy(graph_data), deepcopy(map_data))
+            response[name] = dict(graph_data=graph_data,
+                                  map_data=map_data,
+                                  path_text=str(path))
 
-            for link in graph_data['links']:
-                if link['source'] == dev_a and link['target'] == dev_b:
-                    link['selected'] = True
-                elif link['source'] == dev_b and link['target'] == dev_a:
-                    link['selected'] = True
+        # for i in range(len(connection.main_path['devices']) - 1):
+        #     dev_a = connection.main_path['devices'][i]
+        #     dev_b = connection.main_path['devices'][i + 1]
+        #
+        #     for link in graph_data['links']:
+        #         if link['source'] == dev_a and link['target'] == dev_b:
+        #             link['selected'] = True
+        #         elif link['source'] == dev_b and link['target'] == dev_a:
+        #             link['selected'] = True
+        #
+        #     for link in map_data['links']:
+        #         if link['source'] == dev_a and link['target'] == dev_b:
+        #             link['selected'] = True
+        #         elif link['source'] == dev_b and link['target'] == dev_a:
+        #             link['selected'] = True
 
-            for link in map_data['links']:
-                if link['source'] == dev_a and link['target'] == dev_b:
-                    link['selected'] = True
-                elif link['source'] == dev_b and link['target'] == dev_a:
-                    link['selected'] = True
-
-        response = {
-            'path-text': str(connection.main_path),
-            'graph-data': graph_data,
-            'map-data': map_data,
-        }
+        # response = {
+        #     'path-text': str(connection.main_path),
+        #     'graph-data': graph_data,
+        #     'map-data': map_data,
+        # }
         return JsonResponse(response)
 
     return render(request, 'connection/find_path.html',
                   {'termination_points': termination_points,
                    'graph_data': json.dumps(graph_data),
                    'map_data': json.dumps(map_data)})
+
+
+def test(request):
+    return render(request, 'connection/test.html')

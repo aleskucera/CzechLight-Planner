@@ -1,0 +1,147 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %} Find Path {% endblock %}
+{% block stylesheets %}
+    <style>
+        /* CSS for the tooltip */
+        .tooltip {
+            position: absolute;
+            background-color: #f9f9f9;
+            border: 1px solid #d3d3d3;
+            border-radius: 5px;
+            padding: 8px;
+            pointer-events: none;
+        }
+
+        /* Add shadow effect to node text */
+        .node-text {
+            --stroke-color: white;
+            --stroke-width: 1px;
+            fill: black;
+            text-shadow: var(--stroke-width) 0 0 var(--stroke-color),
+            calc(var(--stroke-width) * -1) 0 0 var(--stroke-color),
+            0 var(--stroke-width) 0 var(--stroke-color),
+            0 calc(var(--stroke-width) * -1) 0 var(--stroke-color);
+            font-size: 12px;
+            font-weight: bold;
+            pointer-events: none; /* Ensure text doesn't interfere with mouse interactions */
+        }
+    </style>
+{% endblock stylesheets %}
+
+{% block content %}
+    <section class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+                    <!-- [ breadcrumb ] start -->
+                    <div class="page-header">
+                        <div class="page-block">
+                            <div class="row align-items-center">
+                                <div class="col-md-12">
+                                    <div class="page-header-title">
+                                        <h5 class="m-b-10">Create Connection</h5>
+                                    </div>
+                                    <ul class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a href="javascript:">Create Connection</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ breadcrumb ] end -->
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <h5>Graph Tabs</h5>
+                                    <hr>
+                                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active text-uppercase" id="tab-1" data-toggle="tab"
+                                               href="#path-1"
+                                               role="tab"
+                                               aria-controls="path-1" aria-selected="true">Path 1</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link text-uppercase" id="tab-2" data-toggle="tab"
+                                               href="#path-2" role="tab"
+                                               aria-controls="path-2" aria-selected="false">Path 2</a>
+                                        </li>
+                                        <!-- Add more tabs as needed -->
+                                    </ul>
+                                    <div class="tab-content" id="myTabContent">
+                                        <div class="tab-pane fade show active" id="path-1" role="tabpanel"
+                                             aria-labelledby="tab-1">
+                                            {#                                            <svg id="graph-1" width="100%" height="500"></svg>#}
+                                        </div>
+                                        <div class="tab-pane fade" id="path-2" role="tabpanel" aria-labelledby="tab-2">
+                                            <svg id="graph-2" width="100%" height="500"></svg>
+                                        </div>
+                                        <!-- Add more tab content divs as needed -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block javascripts %}
+    <!-- D3.js library -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="{% static 'assets/js/connection/tabs.js' %}"></script>
+    <script>
+        // Replace this with actual graph data (nodes and links)
+        const graphData = {
+            nodes: [
+                {id: "LD1"},
+                {id: "LD2"},
+                {id: "LD3"},
+                {id: "LD4"},
+                {id: "LD5"},
+                {id: "LD6"},
+                {id: "AD1"},
+                {id: "AD2"},
+                {id: "AD3"},
+                {id: "TP1"},
+                {id: "TP2"},
+                {id: "TP3"},
+                {id: "TP4"}
+            ],
+            links: [
+                {source: "LD1", target: "LD2"},
+                {source: "LD1", target: "LD3"},
+                {source: "LD1", target: "LD5"},
+                {source: "LD2", target: "LD6"},
+                {source: "LD3", target: "LD6"},
+                {source: "LD5", target: "LD6"},
+                {source: "LD4", target: "AD2"},
+                {source: "LD4", target: "AD3"},
+                {source: "AD2", target: "AD3"},
+                {source: "TP1", target: "TP2"},
+                {source: "TP1", target: "TP4"},
+                {source: "TP2", target: "TP3"},
+                {source: "TP3", target: "TP4"}
+            ]
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Your function call here
+            updateTabs2(graphData);
+        });
+
+        {#// Create D3 force simulations for each graph#}
+        {#const graphElement1 = document.getElementById("graph-1");#}
+        {#const simulation1 = createSimulation(graphData, graphElement1);#}
+        {##}
+        {#const graphElement2 = document.getElementById("graph-2");#}
+        {#const simulation2 = createSimulation(graphData, graphElement2);#}
+    </script>
+{% endblock javascripts %}

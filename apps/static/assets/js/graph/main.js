@@ -1,9 +1,17 @@
-function graphSimulation(graphData, forceCenter) {
-    return d3.forceSimulation(graphData.nodes)
-        .force("link", d3.forceLink(graphData.links).id(d => d.id).distance(d => getLinkDistance(d.type)))
-        .force("charge", d3.forceManyBody(getChargeStrength))
-        .force("center", d3.forceCenter(forceCenter[0], forceCenter[1]))
-        .force("collide", d3.forceCollide(getCollisionRadius))
+function graphSimulation(graphData, [width, height] = [400, 300]) {
+    // Create a D3 force simulation
+    const simulation = d3
+        .forceSimulation(graphData.nodes)
+        .force("link", d3.forceLink(graphData.links).id(d => d.id))
+        .force("charge", d3.forceManyBody().strength(-100))
+        .force("center", d3.forceCenter(width / 2, height / 2));
+
+    // // Warm up the simulation to stabilize the positions
+    // for (let i = 0; i < 100; i++) {
+    //     simulation.tick();
+    // }
+
+    return simulation;
 }
 
 function svgElements(graphData, svgId) {
