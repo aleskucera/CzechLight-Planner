@@ -24,10 +24,12 @@ def get_graph_data(nodes: list) -> dict:
     }
 
     for node in nodes:
+
         graph_data['nodes'].append({
             'id': node.name,
             'type': node.type if isinstance(node, Device) else 'termination_point',
         })
+
         for link in node.list_links(nodes):
             graph_data['links'].append({
                 'source': node.name,
@@ -112,9 +114,9 @@ def select_path(path: dict, graph_data: dict, map_data: dict) -> tuple:
         tuple: A tuple containing the graph and map data with the links in the path selected.
     """
 
-    for i in range(len(path['devices']) - 1):
-        dev_a = path['devices'][i]
-        dev_b = path['devices'][i + 1]
+    for i in range(len(path['nodes']) - 1):
+        dev_a = path['nodes'][i]
+        dev_b = path['nodes'][i + 1]
 
         for link in graph_data['links']:
             if link['source'] == dev_a and link['target'] == dev_b:
@@ -140,42 +142,23 @@ def get_path(request):
     map_data = get_map_data(devices)
 
     if request.method == 'POST':
-        source_id = request.POST.get('source')
-        destination_id = request.POST.get('destination')
+        source_id = request.POST.get('tp_a')
+        destination_id = request.POST.get('tp_b')
 
         source = get_object_or_404(TerminationPoint, pk=source_id)
         destination = get_object_or_404(TerminationPoint, pk=destination_id)
 
-        connection = find_path(source, destination, nodes)
+        paths = find_path(source, destination, nodes)
 
         response = dict()
-        for name, path in connection.alternative_paths.items():
-            graph_data, map_data = select_path(path, deepcopy(graph_data), deepcopy(map_data))
-            response[name] = dict(graph_data=graph_data,
-                                  map_data=map_data,
-                                  path_text=str(path))
+        for name, path in paths.items():
+            path_graph_data, path_map_data = select_path(path, deepcopy(graph_data), deepcopy(map_data))
+            response[name] = dict(graph_data=path_graph_data,
+                                  map_data=path_map_data,
+                                  path_text=str(path),
+                                  tp_a_id=source_id,
+                                  tp_b_id=destination_id)
 
-        # for i in range(len(connection.main_path['devices']) - 1):
-        #     dev_a = connection.main_path['devices'][i]
-        #     dev_b = connection.main_path['devices'][i + 1]
-        #
-        #     for link in graph_data['links']:
-        #         if link['source'] == dev_a and link['target'] == dev_b:
-        #             link['selected'] = True
-        #         elif link['source'] == dev_b and link['target'] == dev_a:
-        #             link['selected'] = True
-        #
-        #     for link in map_data['links']:
-        #         if link['source'] == dev_a and link['target'] == dev_b:
-        #             link['selected'] = True
-        #         elif link['source'] == dev_b and link['target'] == dev_a:
-        #             link['selected'] = True
-
-        # response = {
-        #     'path-text': str(connection.main_path),
-        #     'graph-data': graph_data,
-        #     'map-data': map_data,
-        # }
         return JsonResponse(response)
 
     return render(request, 'connection/find_path.html',

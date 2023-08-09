@@ -6,16 +6,6 @@
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}
     <style>
-        /* CSS for the tooltip */
-        .tooltip {
-            position: absolute;
-            background-color: #f9f9f9;
-            border: 1px solid #d3d3d3;
-            border-radius: 5px;
-            padding: 8px;
-            pointer-events: none;
-        }
-
         /* Add shadow effect to node text */
         .node-text {
             --stroke-color: white;
@@ -60,69 +50,71 @@
                         <div class="page-wrapper">
 
                             <!-- [ Main Content ] start -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Connection Information</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label for="tp-a">Termination Point A</label>
-                                            <select class="form-control" id="tp-a">
-                                                <option value="">-- Select Termination Point --</option>
-                                                {% for tp in termination_points %}
-                                                    <option value="{{ tp.id }}">{{ tp.name }}
-                                                        - {{ tp.description }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="tp-b">Termination Point B</label>
-                                            <select class="form-control" id="tp-b">
-                                                <option value="">-- Select Termination Point --</option>
-                                                {% for tp in termination_points %}
-                                                    <option value="{{ tp.id }}">{{ tp.name }}
-                                                        - {{ tp.description }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <h5>Results</h5>
-                                    <hr>
-                                    <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                    </ul>
-                                    <div class="tab-content" id="myTabContent">
-                                    </div>
-                                </div>
-                            </div>
+                                    <!-- [ Main Content ] start -->
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Connection Information</h5>
+                                        </div>
 
-                            <br>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <form>
+                                                        <div class="form-group">
+                                                            <label for="tp-a">Termination Point A</label>
+                                                            <select class="form-control" id="tp-a">
+                                                                <option value="">-- Select Termination Point --</option>
+                                                                {% for tp in termination_points %}
+                                                                    <option value="{{ tp.id }}">{{ tp.name }}
+                                                                        - {{ tp.description }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="tp-b">Bandwidth [GHz]</label>
+                                                            <input type="number" class="form-control" id="bandwidth"
+                                                                   placeholder="Bandwidth [GHz]">
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <form>
+                                                        <div class="form-group">
+                                                            <label for="tp-b">Termination Point B</label>
+                                                            <select class="form-control" id="tp-b">
+                                                                <option value="">-- Select Termination Point --</option>
+                                                                {% for tp in termination_points %}
+                                                                    <option value="{{ tp.id }}">{{ tp.name }}
+                                                                        - {{ tp.description }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="tp-b">Frequency [GHz] (Optional)</label>
+                                                            <input type="number" class="form-control" id="frequency"
+                                                                   placeholder="Frequency [GHz]">
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <button class="btn btn-primary float-left" id="compute-btn">
+                                                        Compute Connection Options
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div id="map" style="width: 100%; height: 500px;"></div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <svg id="graph" width="100%" height="500"></svg>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-4">
-                                        <div class="col-md-12">
-                                            <button class="btn btn-primary" id="compute-btn">Compute Connection
-                                                Options
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-4">
-                                        <div class="col-md-12">
-                                            <h5>Path:</h5>
-                                            <p id="path-result"></p>
+                                    <div class="row" id="results-row" style="display: none">
+                                        <div class="col-sm-12">
+                                            <h5>Path Options</h5>
+                                            <hr>
+                                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                            </ul>
+                                            <div class="tab-content" id="myTabContent">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -149,46 +141,10 @@
     <script src="{% static 'assets/js/connection/tabs.js' %}"></script>
 
     <script>
-        let simulations = {}; // Declare the simulations object outside any function to make it accessible globally
+        let paths;
         const tpA = document.getElementById('tp-a');
         const tpB = document.getElementById('tp-b');
         const calculateBtn = document.getElementById('compute-btn');
-
-        const graphData = {
-            nodes: [
-                {id: "LD1"},
-                {id: "LD2"},
-                {id: "LD3"},
-                {id: "LD4"},
-                {id: "LD5"},
-                {id: "LD6"},
-                {id: "AD1"},
-                {id: "AD2"},
-                {id: "AD3"},
-                {id: "TP1"},
-                {id: "TP2"},
-                {id: "TP3"},
-                {id: "TP4"}
-            ],
-            links: [
-                {source: "LD1", target: "LD2"},
-                {source: "LD1", target: "LD3"},
-                {source: "LD1", target: "LD5"},
-                {source: "LD2", target: "LD6"},
-                {source: "LD3", target: "LD6"},
-                {source: "LD5", target: "LD6"},
-                {source: "LD4", target: "AD2"},
-                {source: "LD4", target: "AD3"},
-                {source: "AD2", target: "AD3"},
-                {source: "TP1", target: "TP2"},
-                {source: "TP1", target: "TP4"},
-                {source: "TP2", target: "TP3"},
-                {source: "TP3", target: "TP4"}
-            ]
-        };
-
-        let graphElement;
-        let simulation;
 
         // Function to handle the AJAX request and update the graph and map
         function computeConnection() {
@@ -197,11 +153,12 @@
                 type: 'POST',
                 url: '/find-path/',
                 data: {
-                    'source': tpA.value,
-                    'destination': tpB.value
+                    'tp_a': tpA.value,
+                    'tp_b': tpB.value
                 },
                 success: function (response) {
-                    document.getElementById('path-result').textContent = response['1']['path_text'];
+                    paths = response;
+                    document.getElementById('results-row').style.display = 'block';
                     updateTabsAndContent(response);
                 },
                 error: function (xhr, errmsg, err) {
@@ -213,83 +170,4 @@
         // Button click event to calculate path
         calculateBtn.addEventListener('click', computeConnection);
     </script>
-
-    {#    <script>#}
-    {#        const graphData = {{ graph_data|safe }};#}
-    {#        const mapData = {{ map_data|safe }};#}
-    {#        let simulation = graphSimulation(graphData, [400, 300]);#}
-    {#        updateGraph(graphData);#}
-    {#        const tpA = document.getElementById('tp-a');#}
-    {#        const tpB = document.getElementById('tp-b');#}
-    {#        const calculateBtn = document.getElementById('compute-btn');#}
-    {#        const map = createMap('map', [15.251112431996722, 49.78450556341959], 6);#}
-    {##}
-    {#        function updateGraph(graphData) {#}
-    {#            simulation.stop();#}
-    {#            d3.select("#graph").selectAll("*").remove();#}
-    {#            simulation = graphSimulation(graphData, [400, 300]);#}
-    {#            const {svg, link, node, nodeText} = svgElements(graphData, '#graph');#}
-    {##}
-    {#            // Set up tick event for the simulation#}
-    {#            simulation.on("tick", () => {#}
-    {#                link#}
-    {#                    .attr("x1", d => d.source.x)#}
-    {#                    .attr("y1", d => d.source.y)#}
-    {#                    .attr("x2", d => d.target.x)#}
-    {#                    .attr("y2", d => d.target.y);#}
-    {##}
-    {#                node#}
-    {#                    .attr("cx", d => d.x)#}
-    {#                    .attr("cy", d => d.y);#}
-    {##}
-    {#                // Update the text position for node names#}
-    {#                nodeText#}
-    {#                    .attr("x", d => d.x + 12) // Adjust the 'x' position as needed#}
-    {#                    .attr("y", d => d.y + 5); // Adjust the 'y' position as needed#}
-    {#            });#}
-    {#        }#}
-    {##}
-    {#        // Wait for the map style to load#}
-    {#        map.on('load', () => {#}
-    {#            console.log('Map style loaded');#}
-    {#            setTimeout(() => {#}
-    {#                drawLinks(map, mapData['links'], '#6e6f73', 3);#}
-    {#            }, 100);#}
-    {#            setTimeout(() => {#}
-    {#                drawClusteredNodes(map, mapData['nodes']);#}
-    {#            }, 100);#}
-    {#        });#}
-    {##}
-    {#        // Function to update the map with the path visualization#}
-    {#        function updateMap(mapData) {#}
-    {#            console.log('Updating map');#}
-    {#            drawLinks(map, mapData['links'], '#6e6f73', 3);#}
-    {#            drawClusteredNodes(map, mapData['nodes']);#}
-    {#        }#}
-    {##}
-    {#        // Function to handle the AJAX request and update the graph and map#}
-    {#        function computeConnection() {#}
-    {#            // Make AJAX request to the Django view#}
-    {#            $.ajax({#}
-    {#                type: 'POST',#}
-    {#                url: '/find-path/',#}
-    {#                data: {#}
-    {#                    'source': tpA.value,#}
-    {#                    'destination': tpB.value#}
-    {#                },#}
-    {#                success: function (response) {#}
-    {#                    document.getElementById('path-result').textContent = response['1']['path_text'];#}
-    {#                    updateTabsAndContent(response)#}
-    {#                    updateGraph(response['1']['graph_data']);#}
-    {#                    updateMap(response['1']['map_data']);#}
-    {#                },#}
-    {#                error: function (xhr, errmsg, err) {#}
-    {#                    console.log(xhr.status + ": " + xhr.responseText);#}
-    {#                }#}
-    {#            });#}
-    {#        }#}
-    {##}
-    {#        // Button click event to calculate path#}
-    {#        calculateBtn.addEventListener('click', computeConnection);#}
-    {#    </script>#}
 {% endblock javascripts %}

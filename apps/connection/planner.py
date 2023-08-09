@@ -4,7 +4,7 @@ from apps.nodes.models import Device, TerminationPoint
 from .models import Connection
 
 
-def find_path(source: TerminationPoint, destination: TerminationPoint, nodes: list) -> Connection:
+def find_path(source: TerminationPoint, destination: TerminationPoint, nodes: list) -> dict:
     """Finds a path between two termination points in the network of connected devices.
 
     This function performs a Breadth-First Search (BFS) on the state space to explore possible paths
@@ -16,13 +16,10 @@ def find_path(source: TerminationPoint, destination: TerminationPoint, nodes: li
         nodes (list): A list of all devices and termination points in the network.
 
     Returns:
-        Connection: An instance of the Connection model representing the paths found.
-        The Connection object contains the main path and alternative paths from the source to the destination.
+        paths (dict): A dictionary of paths from the source to the destination termination point.
     """
 
-    visited, frontier, counter, connection = set(), deque(), 0, Connection(alternative_paths={})
-    connection.save()
-    connection.termination_points.add(source, destination)
+    visited, frontier, counter, paths = set(), deque(), 0, dict()
 
     initial_state = State(node=source)
     frontier.extend(initial_state.children(nodes))
@@ -31,9 +28,7 @@ def find_path(source: TerminationPoint, destination: TerminationPoint, nodes: li
         current_state = frontier.popleft()
         if current_state.is_target(destination):
             counter += 1
-            if connection.main_path is None:
-                connection.main_path = current_state.construct_path()
-            connection.alternative_paths[counter] = current_state.construct_path()
+            paths[str(counter)] = current_state.construct_path()
             if counter >= 3:
                 break
 
@@ -41,7 +36,7 @@ def find_path(source: TerminationPoint, destination: TerminationPoint, nodes: li
             visited.add(current_state)
             frontier.extend(current_state.children(nodes))
 
-    return connection
+    return paths
 
 
 class State(object):
@@ -98,19 +93,20 @@ class State(object):
             dict: A dictionary representing the path with devices, connections, and ports.
         """
 
-        state, path = self, dict(devices=[], link_types=[], ports=[])
+        state, path = self, dict(nodes=[], link_types=[], ports=[])
         while state.parent is not None:
-            if isinstance(state.node, Device):
-                path['devices'].append(state.node.name)
-                path['link_types'].append(state.link_type)
-                path['ports'].append(state.port)
+            path['nodes'].append(state.node.name)
+            path['link_types'].append(state.link_type)
+            path['ports'].append(state.port)
 
             state = state.parent
 
+        path['nodes'].append(state.node.name)
+
         # Reverse the path and take out the first connection
-        path['devices'] = path['devices'][::-1]
-        path['link_types'] = path['link_types'][:-1][::-1]
-        path['ports'] = path['ports'][:-1][::-1]
+        path['nodes'] = path['nodes'][::-1]
+        path['link_types'] = path['link_types'][::-1]
+        path['ports'] = path['ports'][::-1]
 
         return path
 
