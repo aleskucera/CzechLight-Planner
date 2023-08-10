@@ -1,0 +1,17 @@
+<data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <media-channels xmlns="http://czechlight.cesnet.cz/yang/czechlight-roadm-device">
+        <channel>C-band</channel>
+        <description>Whole-band overview</description>
+    </media-channels>
+    <media-channels xmlns="http://czechlight.cesnet.cz/yang/czechlight-roadm-device">
+        <channel>54.0</channel>
+        <add>
+            <port>E1</port>
+            <attenuation>10.0</attenuation>
+        </add>
+        <drop>
+            <port>E1</port>
+            <attenuation>10.0</attenuation>
+        </drop>
+    </media-channels>
+</data>

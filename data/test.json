@@ -1,0 +1,21 @@
+{
+  "data": {
+    "media-channels": [
+      {
+        "channel": "C-band",
+        "description": "Whole-band overview"
+      },
+      {
+        "channel": "54.0",
+        "add": {
+          "port": "E1",
+          "attenuation": "10.0"
+        },
+        "drop": {
+          "port": "E1",
+          "attenuation": "10.0"
+        }
+      }
+    ]
+  }
+}
